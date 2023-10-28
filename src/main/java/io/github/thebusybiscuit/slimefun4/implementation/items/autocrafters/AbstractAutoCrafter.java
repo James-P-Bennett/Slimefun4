@@ -217,17 +217,46 @@ public abstract class AbstractAutoCrafter extends SlimefunItem implements Energy
     public abstract AbstractRecipe getSelectedRecipe(@Nonnull Block b);
 
     /**
-     * This method is called when a {@link Player} right clicks the {@link AbstractAutoCrafter}
-     * while holding the shift button.
-     * Use it to choose the {@link AbstractRecipe}.
-     * 
-     * @param b
-     *            The {@link Block} which was clicked
-     * @param p
-     *            The {@link Player} who clicked
-     */
-    protected abstract void updateRecipe(@Nonnull Block b, @Nonnull Player p);
+ * This method is called when a {@link Player} right clicks the {@link AbstractAutoCrafter}
+ * while holding the shift button.
+ * Use it to choose the {@link AbstractRecipe}.
+ * 
+ * @param b
+ *     The {@link Block} which was clicked
+ * @param p
+ *     The {@link Player} who clicked
+ */
+protected void updateRecipe(@Nonnull Block b, @Nonnull Player p) {
+    Validate.notNull(b, "The Block must not be null!");
+    Validate.notNull(p, "The Player cannot be null!");
 
+    ItemStack itemInHand = p.getInventory().getItemInMainHand();
+
+    // Check if the item in hand is a hopper (or any other item you want to deny)
+    if (itemInHand != null && itemInHand.getType() == Material.HOPPER) {
+        p.sendMessage("§cYou cannot auto-craft hoppers on this server.");
+        return; // Don't proceed with the update
+    }
+
+    ChestMenu menu = new ChestMenu(getItemName());
+    menu.setPlayerInventoryClickable(false);
+    menu.setEmptySlotsClickable(false);
+
+    ChestMenuUtils.drawBackground(menu, background);
+    ChestMenuUtils.drawBackground(menu, 45, 46, 47, 48, 50, 51, 52, 53);
+
+    AsyncRecipeChoiceTask task = new AsyncRecipeChoiceTask();
+    AbstractRecipe recipe = getSelectedRecipe(b);
+    recipe.show(menu, task);
+    menu.open(p);
+
+    SoundEffect.AUTO_CRAFTER_GUI_CLICK_SOUND.playFor(p);
+
+    // Only schedule the task if necessary
+    if (!task.isEmpty()) {
+        task.start(menu.toInventory());
+    }
+}
     /**
      * This method sets the selected {@link AbstractRecipe} for the given {@link Block}.
      * The recipe will be stored using the {@link PersistentDataAPI}.
