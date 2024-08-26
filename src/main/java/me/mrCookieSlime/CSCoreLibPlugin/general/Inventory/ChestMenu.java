@@ -226,7 +226,7 @@ public class ChestMenu {
     private void setup() {
         if (this.inv != null)
             return;
-        this.inv = Bukkit.createInventory(null, ((int) Math.ceil(this.items.size() / 9F)) * 9, title);
+        this.inv = Bukkit.createInventory(null, 54, title);
         for (int i = 0; i < this.items.size(); i++) {
             this.inv.setItem(i, this.items.get(i));
         }
@@ -236,7 +236,7 @@ public class ChestMenu {
         if (update)
             this.inv.clear();
         else
-            this.inv = Bukkit.createInventory(null, ((int) Math.ceil(this.items.size() / 9F)) * 9, title);
+            this.inv = Bukkit.createInventory(null, 54, title);
         for (int i = 0; i < this.items.size(); i++) {
             this.inv.setItem(i, this.items.get(i));
         }
